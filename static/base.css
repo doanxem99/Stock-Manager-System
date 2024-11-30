@@ -1,0 +1,64 @@
+body {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 400;
+    background-color: rgb(255, 255, 255);
+    color: rgb(0, 0, 0);
+}
+
+.graph-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 10px;
+    margin-left: auto;
+    margin-right: auto;
+    border-radius: 5px;
+    background-color: #d0d0d0;
+}
+
+.graph {
+    width: 100%;
+    max-width: fit-content;
+    overflow-x: scroll;
+}
+
+.chatbox {
+    margin-top: 20px;
+    margin-bottom: 20px;
+    padding: 5px;
+    border-radius: 5px;
+    background-color: #d0d0d0;
+    color: #000000;
+    width: 100%;
+    height: 420px;
+    overflow-y: scroll;
+}
+
+.botchat{
+    margin-top: 10px;
+    color: rgb(255, 55, 55);
+}
+
+.userchat{
+    margin-top: 10px;
+    color: rgb(55, 78, 255);
+}
+
+.table {
+    margin-left: 10px;
+    margin-top: 20px;
+    padding: 20px;
+    overflow-y: scroll;
+    border-radius: 5px;
+    background-color: #d0d0d0;
+    color: #000000;
+    box-shadow: 0 0 10px rgba(66, 63, 63, 0.1);
+}
+
+.table-hover tbody tr:hover td, .table-hover tbody tr:hover th {
+    background-color: #383333;
+}
+
+.start_date, .end_date {
+    margin-right: 25px;
+}

@@ -1,0 +1,52 @@
+{%extends "/shared/base.html"%}
+
+{%block head%}
+<link rel="stylesheet" href="static/base.css">
+<link rel="stylesheet" href="static/sign.css">
+{%endblock%}
+
+{%block content%}
+<div class="container-fluid text-center mt-5">
+    <h1>Stock Prediction Model</h1>
+    <form class="form-horizontal mt-4" method="POST" action="/predict">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="row chatbox" style="margin-left: 5px;">
+                    <div class="col-md-6">
+                        <label for="" class="form-label">Total capital</label>
+                        <input
+                        type="text"
+                        name="total_capital"
+                        id="totalcapital"
+                        class="form-control"
+                        placeholder="Enter your total capital you want to invest"
+                        aria-describedby="helpId"
+                        />
+                        <small id="helpId" class="text-muted">Total capital you want to invest for model prediction</small>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="" class="form-label">Risk tolerance</label>
+                        <input
+                        type="text"
+                        name="risk_tolerance"
+                        id="risktolerance"
+                        class="form-control"
+                        placeholder="Enter number between 0 and 1"
+                        aria-describedby="helpId"
+                        />
+                        <small id="helpId" class="text-muted">Enter the risk tolerance between 0 and 1</small>
+                    </div>
+                    <button type="submit" class="btn btn-lg btn-primary btn-block" style="margin-top: 20px;">Predict</button>
+                </div>
+            </div>
+        </div>
+    </form>     
+
+    {% if prediction %}
+    <div class="mt-4">
+        <h2>Predicted Stocks</h2>
+        <p>{{ prediction }}</p>
+    </div>
+    {% endif %}
+</div>
+{%endblock%}

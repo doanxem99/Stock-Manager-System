@@ -1,0 +1,238 @@
+{%extends "/shared/base.html"%}
+
+{%block head%}
+<link rel="stylesheet" href="static/base.css">
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+<!-- DataTables JS -->
+<script src="https://cdn.datatables.net/1.13.5/js/jquery.dataTables.min.js"></script>
+<!-- DataTables CSS -->
+<link rel="stylesheet" href="https://cdn.datatables.net/2.1.8/css/dataTables.dataTables.css">
+
+{%endblock%}
+
+{%block content%}
+<div class="container-fluid text-center">
+    <div class="row">
+        <div class="col-md-6">
+            <h3>Market</h3>
+            <!--Most active, Trending, Top gainer, Top loser on the left-->
+            <div class="btn-group col-sm-8" style="margin-bottom: 10px;">
+                <button type="submit" class="btn btn-primary" name="market" value="most_active">Most Active</button>
+                <button type="submit" class="btn btn-primary" name="market" value="trending">Trending</button>
+                <button type="submit" class="btn btn-primary" name="market" value="top_gainer">Top Gainer</button>
+                <button type="submit" class="btn btn-primary" name="market" value="top_loser">Top Loser</button>
+            </div>
+            <table class="table table-hover" id="table">
+                <thead>
+                    <tr>
+                        <th data-dt-column="0" rowspan="1" colspan="1" class="col-sm-1 dt-orderable-asc dt-orderable-desc dt-ordering-asc" aria-sort="ascending" aria-label="Name: Activate to invert sorting" tabindex="0">
+                            <span class="dt-column-title" role="button">Name</span>
+                        </th>
+                        <th scope="col" class="col-sm-1 dt-orderable-acs dt-orderable-desc">
+                            <span class="dt-column-title" role="button">High</span>
+                        </th>
+                        <th scope="col" class="col-sm-1 dt-orderable-acs dt-orderable-desc">
+                            <span class="dt-column-title" role="button">Low</span>
+                        </th>
+                        <th scope="col" class="col-sm-1 dt-orderable-acs dt-orderable-desc">
+                            <span class="dt-column-title" role="button">Open</span>
+                        </th>
+                        <th scope="col" class="col-sm-1 dt-orderable-acs dt-orderable-desc">
+                            <span class="dt-column-title" role="button">Close</span>
+                        </th>
+                        <th scope="col" class="col-sm-1 dt-orderable-acs dt-orderable-desc">
+                            <span class="dt-column-title" role="button">Volume</span>
+                        </th>
+                        <th scope="col" class="col-sm-1 dt-orderable-acs dt-orderable-desc">
+                            <span class="dt-column-title" role="button">Time</span>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for i in range(data.num_rows): %}
+                    <tr>
+                        <td>{{ data.data_stocks[i].name }}</td>
+                        <td>{{ data.data_stocks[i].high }}</td>
+                        <td>{{ data.data_stocks[i].low }}</td>
+                        <td>{{ data.data_stocks[i].open }}</td>
+                        <td>{{ data.data_stocks[i].close }}</td>
+                        <td>{{ data.data_stocks[i].volume }}</td>
+                        <td>{{ data.data_stocks[i].time }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="col-md-6">
+            <h3>Graph</h3>
+            <div class="row">
+                <div class="col-sm-8">
+                </div>
+                <div class="col-sm-2">
+                    <input type="date" id="start_date" name="start_date" value="{{ data.start_date }}">
+                </div>
+                <div class="col-sm-2">
+                    <input type="date" id="end_date" name="end_date" value="{{ data.end_date }}">
+                </div>
+            </div>
+
+            <div class="graph-container">
+                <div id="graph" class="graph"></div>
+            </div>
+
+            <!-- Analysis graph with gemini -->
+            <h3>Analysis</h3>
+            <div class="text-container text-left">
+                <div id="chatbox" class="chatbox">
+                    <p class="botchat">
+                        <span> Bot: {{ data.gemini_response }}</span>
+                    </p>
+                </div>
+                <form>
+                    <input type="text" id="userinput" class="form-control" placeholder="Type your message here" name="userinput">
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    // when user change the start_date or end_date, update the graph
+    $('#start_date, #end_date').change(function () {
+        $.ajax({
+            type: "POST",
+            url: "/date",
+            contentType: "application/json", // Tell the server it's JSON
+            data: JSON.stringify({
+                start_date: $('#start_date').val(), // Send the start_date
+                end_date: $('#end_date').val(),     // Send the end_date
+            }),
+            success: function (response) {
+                response = JSON.parse(response);
+                Plotly.newPlot('graph', response, {}, { responsive: true });
+            },
+            error: function (error) {
+                console.log(error);
+            }
+        });
+    });
+
+
+    // create a DataTable object
+    const table = new DataTable('#table', {
+        order: [[1, "desc"]],
+        paging: true,
+        searching: true,
+        lengthChange: true,
+        pageLength: 30,
+        autoFill: true,
+        responsive: true,
+        dom: 'Bfrtip'
+    });
+
+    // when user clicks a row, toggle the selected class
+    $('#table tbody').on('click', 'tr', function () {
+        let classList = this.classList;
+        var data = table.row(this).data();
+        if (classList.contains('selected')) {
+            classList.remove('selected');
+        } else {
+            table.rows('.selected').nodes().each((row) => row.classList.remove('selected'));
+            classList.add('selected');
+        }
+        $.ajax({
+            type: "POST",
+            url: "/graph",
+            contentType: "application/json", // Tell the server it's JSON
+            data: JSON.stringify({
+                data: data,                      // Send the data object
+            }),
+            success: function (response) {
+                console.log(response);
+                response = JSON.parse(response);
+                Plotly.newPlot('graph', response, {}, { responsive: true });
+            },
+            error: function (error) {
+                console.log(error);
+            }
+        });
+    });
+
+    // get graph_json from server argument render_template and render the graph
+
+    graph_data = JSON.parse( '{{ data.graph_json | safe }}' );
+    graph_config = {
+        responsive: true,
+    };
+    // If in phone mode, change the width and height of the graph
+    if (window.innerWidth < 500) {
+        Plotly.toImage(graph_data, {
+            format: 'png',
+            width: 300,
+            height: 500,
+            config: graph_config
+        }).then(function(url) {
+            var img = document.createElement('img');
+            img.src = url;
+            var graph = document.getElementById('graph');
+            graph.appendChild(img);
+        });
+    }
+    else {
+        Plotly.newPlot('graph', graph_data, {}, graph_config);
+    }
+    
+    <!-- // Data from stocks will be used one time to get response from gemini -->
+    $(document).ready(function() {
+
+        $('#userinput').keypress(function(event) {
+            // Check if the user pressed the Enter key
+            // and that the Shift key is not pressed
+            if (event.keyCode === 13 && !event.shiftKey) {
+                event.preventDefault(); // Prevent default form submission
+                $('form').submit(); // Submit the form
+            }
+        });
+        
+
+        // Prevent form submission
+        $('form').submit(function(event) {
+            event.preventDefault(); // Stop the page from reloading
+            var userinput = $('#userinput').val(); // Get the user's input
+
+            if (userinput) {
+                // Add the user's message to the chatbox
+                var userchat = document.createElement("p");
+                userchat.className = "userchat";
+                userchat.innerHTML = "<span> You: " + userinput + "</span>";
+                $('#chatbox').append(userchat);
+                $('#userinput').val(""); // Clear the input field
+                $('#chatbox').scrollTop($('#chatbox')[0].scrollHeight); // Scroll to the bottom of the chatbox
+
+                // Send the user's input to the server via AJAX
+                $.ajax({
+                    type: "POST",
+                    url: "/gemini",
+                    data: { userinput: userinput },
+                    success: function(response) {
+                        // Add the server's response to the chatbox
+                        var botchat = document.createElement("p");
+                        botchat.className = "botchat";
+                        botchat.innerHTML = "<span> Bot: " + response + "</span>";
+                        $('#chatbox').append(botchat);
+                        $('#chatbox').scrollTop($('#chatbox')[0].scrollHeight); // Scroll to the bottom of the chatbox
+                    },
+                    error: function() {
+                        // Add an error message to the chatbox if the request fails
+                        var botchat = document.createElement("p");
+                        botchat.className = "botchat";
+                        botchat.innerHTML = "<span> Gemini: Sorry, I couldn't understand that. Please try again.</span>";
+                        $('#chatbox').append(botchat);
+                        $('#chatbox').scrollTop($('#chatbox')[0].scrollHeight); // Scroll to the bottom of the chatbox
+                    }
+                });
+            }
+        });
+    });
+</script>            
+{%endblock%}
+

@@ -1,0 +1,64 @@
+<!-- This page is design for tab bar -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <link rel="icon" href="static/image/stock.png" type="image/gif" sizes="16x16">
+    <title class="title">
+        Portfolio Management System
+    </title>
+    <link rel="stylesheet" href="static/style.css">
+    <link rel="stylesheet" href="static/layout.css">
+    {% block head %}
+    {% endblock %}
+</head>
+<body>
+    <nav class="navbar navbar-inverse">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>                        
+                </button>
+                <a class="navbar-brand" href="#">
+                    <img src="static/image/stock.png" alt="logo" style="width:50px;height:50px; margin-top: -20px; display: inline-block;">
+                    Portfolio Management System
+                </a>
+            </div>
+            <div class="collapse navbar-collapse justify-content-center" id="myNavbar">
+                <ul class="nav navbar-nav">
+                    <li class="active"><a href="http://127.0.0.1:5000/">Home</a></li>
+                    <li><a href="http://127.0.0.1:5000/investment">Investment</a></li>
+                </ul>
+                <ul class="nav navbar-nav navbar-right">
+                    {% if session.user %}
+                        <div class="dropdown profile">
+                            <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">
+                                <span class="glyphicon glyphicon-user"></span> {{ session.user }}
+                                <span class="caret"></span>
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a href="http://127.0.0.1:5000/profile"><span class="glyphicon glyphicon-user"></span> Profile</a></li>
+                                <li><a href="http://127.0.0.1:5000/changepassword"><span class="glyphicon glyphicon-lock"></span> Change Password</a></li>
+                                <li><a href="http://127.0.0.1:5000/signout"><span class="glyphicon glyphicon-log-out"></span> Log Out</a></li>
+                            </ul>
+                        </div>
+                    {% else %}
+                        <li><a href="signin"><span class="glyphicon glyphicon-log-in"></span> Sign In</a></li>
+                        <li><a href="signup"><span class="glyphicon glyphicon-user"></span> Sign Up</a></li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+    {% block content %}
+    {% endblock %}
+</body>
+{% block footer %}
+{% endblock %}
+</html>

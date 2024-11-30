@@ -1,0 +1,22 @@
+/* Custom CSS */
+
+.navbar-brand {
+    display: flex;
+    font-size: 2.0rem;
+    font-weight: bolder;
+}
+
+.navbar-center {
+    display: flex;
+    justify-content: center;
+} 
+  
+
+body {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: bold;
+}
+
+.profile {
+    margin-top: 10px;
+}
